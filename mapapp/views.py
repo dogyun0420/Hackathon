@@ -5,6 +5,7 @@ import requests
 from django.shortcuts import render
 from .models import OutdoorShelter
 from django.http import JsonResponse
+from django.http import HttpResponse
 
 def get_nearest_shelter(request):
     user_latitude = float(request.GET.get('latitude'))
@@ -46,12 +47,17 @@ def find_nearest_shelters(latitude, longitude, num_shelters=3):
 
 # Rest of the code remains the same
 
+def set_cookie_example(request):
+    response = HttpResponse("Cookie set with SameSite attribute")
+    response.set_cookie('my_cookie', 'cookie_value', samesite='Lax')  # You can use 'Strict' or 'Lax'
+    return response
+
 def map_view(request):
     if "geolocation" in request.GET:
         user_latitude = float(request.GET.get('latitude'))
         user_longitude = float(request.GET.get('longitude'))
 
-        nearest_shelters = find_nearest_shelters(user_latitude, user_longitude, num_shelters=3)  # 여기를 수정하여 원하는 대피소 개수로 변경
+        nearest_shelters = find_nearest_shelters(user_latitude, user_longitude, num_shelters=3)
         
         shelters_data = [{
             'vt_acmdfclty_nm': shelter.vt_acmdfclty_nm,
