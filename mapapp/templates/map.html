@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nearest Shelter Map</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=2dGQfai3cs3zCZ4EdAkbX62hAsNrCO8N50yYPfWL"></script>
+    <script>
+        var map;
+        var userMarker;
+        var shelterMarker;
+
+        function initMap() {
+            var userLat = {{ user_lat }};
+            var userLng = {{ user_lng }};
+            var nearestShelterName = "{{ nearest_shelter_name }}";
+            var nearestShelterAddress = "{{ nearest_shelter_address }}";
+
+            map = new Tmapv2.Map("map_div", {
+                center: new Tmapv2.LatLng(userLat, userLng),
+                width: "100%",
+                height: "400px",
+                zoom: 15,
+                zoomControl: true,
+                scrollwheel: true
+            });
+
+            userMarker = new Tmapv2.Marker({
+                position: new Tmapv2.LatLng(userLat, userLng),
+                icon: "/path/to/user-marker.png",
+                iconSize: new Tmapv2.Size(24, 38),
+                map: map
+            });
+
+            if (nearestShelterName && nearestShelterAddress) {
+                var geocoder = new Tmapv2.Geocoder();
+
+                geocoder.addressSearch(nearestShelterAddress, function(result) {
+                    shelterMarker = new Tmapv2.Marker({
+                        position: new Tmapv2.LatLng(result[0].y, result[0].x),
+                        icon: "/path/to/shelter-marker.png",
+                        iconSize: new Tmapv2.Size(24, 38),
+                        map: map
+                    });
+                });
+            }
+        }
+    </script>
+</head>
+<body onload="initMap()">
+    <div id="map_div"></div>
+    <p>가장 가까운 옥외대피소: {{ nearest_shelter_name }}</p>
+    <p>주소: {{ nearest_shelter_address }}</p>
+</body>
+</html>
