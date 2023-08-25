@@ -1,46 +1,69 @@
+# mapapp/views.py
+
+import math
 import requests
 from django.shortcuts import render
+from .models import OutdoorShelter
 from django.http import JsonResponse
 
-def get_nearest_shelter(start_lat, start_lng):
-    api_key = "API-KEY"
-    base_url = "https://apis.openapi.sk.com/tmap/pois"
+def get_nearest_shelter(request):
+    user_latitude = float(request.GET.get('latitude'))
+    user_longitude = float(request.GET.get('longitude'))
+    
+    print('a'+ user_latitude, user_longitude)
+    nearest_shelter = find_nearest_shelters(user_latitude, user_longitude)
+    
+    return render(request, 'map.html', {'nearest_shelter': nearest_shelter})
 
-    params = {
-        "version": 1,
-        "format": "json",
-        "appKey": api_key,
-        "centerLon": start_lng,
-        "centerLat": start_lat,
-        "count": 1,  # 가장 가까운 1개의 결과만 요청
-        "radius": 5000,  # 검색 반경 (5km)
-        "page": 1
-    }
+def haversine(lat1, lon1, lat2, lon2):
+    # Haversine formula to calculate distance between two points
+    lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
 
-    response = requests.get(base_url, params=params)
-    data = response.json()
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
 
-    if "searchPoiInfo" in data and "pois" in data["searchPoiInfo"]:
-        pois = data["searchPoiInfo"]["pois"]
-        if pois:
-            nearest_shelter = pois[0]
-            shelter_name = nearest_shelter["name"]
-            shelter_address = nearest_shelter["upperAddrName"] + " " + nearest_shelter["middleAddrName"]
-            return shelter_name, shelter_address
-    return None, None
+    a = math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
-def show_map(request):
-    # 사용자의 위치 (예: 서울)
-    user_lat = 37.5665
-    user_lng = 126.9780
+    # Radius of Earth in kilometers
+    radius = 6371.0
 
-    # 가장 가까운 옥외대피소 정보 가져오기
-    nearest_shelter_name, nearest_shelter_address = get_nearest_shelter(user_lat, user_lng)
+    distance = radius * c
+    return distance
 
-    context = {
-        "user_lat": user_lat,
-        "user_lng": user_lng,
-        "nearest_shelter_name": nearest_shelter_name,
-        "nearest_shelter_address": nearest_shelter_address,
-    }
-    return render(request, "map.html", context)
+def find_nearest_shelters(latitude, longitude, num_shelters=3):
+    shelters = OutdoorShelter.objects.all()
+    
+    distances = []
+    for shelter in shelters:
+        shelter_distance = haversine(latitude, longitude, shelter.ycord, shelter.xcord)
+        distances.append((shelter, shelter_distance))
+    
+    distances.sort(key=lambda x: x[1])  # Sort by distance
+    nearest_shelters = [shelter for shelter, _ in distances[:num_shelters]]
+    
+    return nearest_shelters
+
+# Rest of the code remains the same
+
+def map_view(request):
+    if "geolocation" in request.GET:
+        user_latitude = float(request.GET.get('latitude'))
+        user_longitude = float(request.GET.get('longitude'))
+
+        nearest_shelters = find_nearest_shelters(user_latitude, user_longitude, num_shelters=3)  # 여기를 수정하여 원하는 대피소 개수로 변경
+        
+        shelters_data = [{
+            'vt_acmdfclty_nm': shelter.vt_acmdfclty_nm,
+            'dtl_adres': shelter.dtl_adres,
+            'ycord': shelter.ycord,
+            'xcord': shelter.xcord,
+        } for shelter in nearest_shelters]
+        
+        data = {
+            'nearest_shelters': shelters_data
+        }
+        
+        return JsonResponse(data)  # JSON 응답 반환
+    
+    return render(request, 'map.html')
