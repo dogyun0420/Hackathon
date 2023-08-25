@@ -25,11 +25,11 @@
 				// 1. 지도 띄우기
 				map = new Tmapv2.Map("map_div", {
 					center : new Tmapv2.LatLng(user_x, user_y),
-					width : "40%",
+					width : "50%",
 					height : "400px",
 					zoom : 16,
 					zoomControl : true,
-					scrollwheel : true
+					scrollwheel : true,
 				});
 		
 				// 2. 시작, 도착 심볼찍기
@@ -53,12 +53,13 @@
 							map : map
 						});
 				// 3. 경로탐색 API 사용요청
-				// $("#btn_select")
-				// 		.click(
+				$("#btn_select")
+						.click(
+                            function(){
 								// 3. 경로탐색 API 사용요청
-		var headers = {}; 
+		    var headers = {}; 
 			headers["appKey"]="2dGQfai3cs3zCZ4EdAkbX62hAsNrCO8N50yYPfWL";
-
+                        
 		$.ajax({
 				method : "POST",
 				headers : headers,
@@ -175,8 +176,8 @@
 							+ "error:" + error);
 				}
 			});
-
-	}
+        }
+	)}
 
 	function addComma(num) {
 		var regexp = /\B(?=(\d{3})+(?!\d))/g;
@@ -199,7 +200,6 @@
     </script>
 </head>
 <body onload="initTmap();">
-	
 		<!-- 190430 기존 지도를 모두 이미지 처리 위해 주석 처리 S -->
 		<div id="map_wrap" class="map_wrap3">
 			<div id="map_div"></div>

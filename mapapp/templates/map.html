@@ -1,54 +1,63 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Nearest Shelter Map</title>
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=API-KEY"></script>
-    <script>
-        var map;
-        var userMarker;
-        var shelterMarker;
+    <title>Nearest Shelters</title>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+</head>
+<body>
 
-        function initMap() {
-            var userLat = { user_lat };
-            var userLng = { user_lng };
-            var nearestShelterName = "{{ nearest_shelter_name }}";
-            var nearestShelterAddress = "{{ nearest_shelter_address }}";
+<div id="map" style="height: 400px;"></div>
 
-            map = new Tmapv2.Map("map_div", {
-                center: new Tmapv2.LatLng(userLat, userLng),
-                width: "100%",
-                height: "400px",
-                zoom: 15,
-                zoomControl: true,
-                scrollwheel: true
-            });
+<!-- 위치 정보 표시 -->
+<div id="location-info">
+    <p>Your Location: <span id="user-location"></span></p>
+    <p>Nearest Shelters:</p>
+    <ul id="shelters-list"></ul>
+</div>
 
-            userMarker = new Tmapv2.Marker({
-                position: new Tmapv2.LatLng(userLat, userLng),
-                icon: "/path/to/user-marker.png",
-                iconSize: new Tmapv2.Size(24, 38),
-                map: map
-            });
+<script>
+    var map = L.map('map').setView([0, 0], 13);
 
-            if (nearestShelterName && nearestShelterAddress) {
-                var geocoder = new Tmapv2.Geocoder();
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+    }).addTo(map);
 
-                geocoder.addressSearch(nearestShelterAddress, function(result) {
-                    shelterMarker = new Tmapv2.Marker({
-                        position: new Tmapv2.LatLng(result[0].y, result[0].x),
-                        icon: "/path/to/shelter-marker.png",
-                        iconSize: new Tmapv2.Size(24, 38),
-                        map: map
+    if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            var userLatitude = position.coords.latitude;
+            var userLongitude = position.coords.longitude;
+
+            map.setView([userLatitude, userLongitude], 13);
+            var userMarker = L.marker([userLatitude, userLongitude]).addTo(map);
+            userMarker.bindPopup("Your Location").openPopup();
+
+            document.getElementById('user-location').textContent = '(' + userLatitude + ', ' + userLongitude + ')';
+            
+            fetch('/map_view/?geolocation=1&latitude=' + userLatitude + '&longitude=' + userLongitude)
+                .then(response => response.json())
+                .then(data => {
+                    var sheltersList = document.getElementById('shelters-list');
+                    
+                    // Show nearest shelter
+                    var nearestShelter = data.nearest_shelters[0];
+                    var shelterMarker = L.marker([nearestShelter.ycord, nearestShelter.xcord]).addTo(map);
+                    shelterMarker.bindPopup("<b>" + nearestShelter.vt_acmdfclty_nm + "</b><br>" + nearestShelter.dtl_adres).openPopup();
+
+                    // Show other shelters and add to shelters list
+                    data.nearest_shelters.slice(0).forEach(shelter => {
+                        var shelterMarker = L.marker([shelter.ycord, shelter.xcord]).addTo(map);
+                        shelterMarker.bindPopup("<b>" + shelter.vt_acmdfclty_nm + "</b><br>" + shelter.dtl_adres);
+                        
+                        var shelterItem = document.createElement('li');
+                        shelterItem.textContent = shelter.vt_acmdfclty_nm + ': (' + shelter.ycord + ', ' + shelter.xcord + ')';
+                        sheltersList.appendChild(shelterItem);
                     });
                 });
-            }
-        }
-    </script>
-</head>
-<body onload="initMap()">
-    <div id="map_div"></div>
-    <p>가장 가까운 옥외대피소: {{ nearest_shelter_name }}</p>
-    <p>주소: {{ nearest_shelter_address }}</p>
+        });
+    }
+    
+</script>
+
 </body>
 </html>
