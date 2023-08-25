@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 
 def get_nearest_shelter(start_lat, start_lng):
-    api_key = "2dGQfai3cs3zCZ4EdAkbX62hAsNrCO8N50yYPfWL"
+    api_key = "API-KEY"
     base_url = "https://apis.openapi.sk.com/tmap/pois"
 
     params = {
