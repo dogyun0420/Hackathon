@@ -1,8 +1,4 @@
-# mapapp/admin.py
-
 from django.contrib import admin
-from django.urls import path
-from django.shortcuts import render
 from django.utils.html import format_html
 from .models import OutdoorShelter
 

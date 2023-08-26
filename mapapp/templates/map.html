@@ -6,8 +6,13 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 </head>
 <body>
-
-<div id="map" style="height: 400px;"></div>
+<style>
+    #map{
+        width: 100%;
+        height: 1000px; /* Set map to fill the info box */
+    }
+</style>
+<div id="map"></div>
 
 <!-- 위치 정보 표시 -->
 <div id="location-info">
@@ -17,11 +22,16 @@
 </div>
 
 <script>
+    document.cookie = 'my_cookie=cookie_value; samesite=lax';
     var map = L.map('map').setView([0, 0], 13);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
     }).addTo(map);
+
+    function showRouteWithEnd(userLatitude, userLongitude, endLatitude, endLongitude) {
+        window.location.href = `/tmap?user_lat=${userLatitude}&user_lng=${userLongitude}&end_lat=${endLatitude}&end_lng=${endLongitude}`;
+    }
 
     if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(function(position) {
@@ -43,11 +53,17 @@
                     var nearestShelter = data.nearest_shelters[0];
                     var shelterMarker = L.marker([nearestShelter.ycord, nearestShelter.xcord]).addTo(map);
                     shelterMarker.bindPopup("<b>" + nearestShelter.vt_acmdfclty_nm + "</b><br>" + nearestShelter.dtl_adres).openPopup();
+                    shelterMarker.on('click', function () {
+                        showRouteWithEnd(userLatitude, userLongitude, nearestShelter.ycord, nearestShelter.xcord);
+                    });
 
                     // Show other shelters and add to shelters list
                     data.nearest_shelters.slice(0).forEach(shelter => {
                         var shelterMarker = L.marker([shelter.ycord, shelter.xcord]).addTo(map);
                         shelterMarker.bindPopup("<b>" + shelter.vt_acmdfclty_nm + "</b><br>" + shelter.dtl_adres);
+                        shelterMarker.on('click', function () {
+                            showRouteWithEnd(userLatitude, userLongitude, shelter.ycord, shelter.xcord);
+                        });
                         
                         var shelterItem = document.createElement('li');
                         shelterItem.textContent = shelter.vt_acmdfclty_nm + ': (' + shelter.ycord + ', ' + shelter.xcord + ')';
@@ -57,7 +73,18 @@
         });
     }
     
+    function showRoute() {
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var userLatitude = position.coords.latitude;
+                var userLongitude = position.coords.longitude;
+
+                window.location.href = `/tmap?user_lat=${userLatitude}&user_lng=${userLongitude}`;
+            });
+        }
+    }
 </script>
 
 </body>
+
 </html>
