@@ -4,6 +4,7 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% load static %}
 <style>
 body {
     width: 100%;
@@ -52,9 +53,15 @@ body {
     background-color: brown;
 }
 
-
+#map {
+    width: 500px; /* 지도 너비 조절 */
+    height: 400px; /* 지도 높이 조절 */
+    margin-top: 20px;
+}
 </style>
 <title>Box 및 버튼 예제</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 </head>
 <body>
     <div id='container'>
@@ -70,5 +77,43 @@ body {
             <p id="'backgrond">스타필드 한글화 왜 안해주냐고.</p>
         </div>
     </div>
+
+<div id="map" style="width: 100%; height: 100%;"></div>
+
+    
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var storedData = localStorage.getItem('popupData');
+    if (storedData) {
+        var info = JSON.parse(storedData);
+        var info_box = document.getElementById('info_box');
+        
+        var content = `
+            <p>Latitude: ${info.lat}</p>
+            <p>Longitude: ${info.lon}</p>
+            <p>Magnitude: ${info.mt}</p>
+            <p>Intensity: ${info.inT}</p>
+        `;
+        
+        info_box.innerHTML = content;
+        
+        // Create and display the map
+        var map = L.map('map').setView([info.lat, info.lon], 13);
+
+        // Add a tile layer (OpenStreetMap)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+
+        // Add a marker at the earthquake location
+        L.marker([info.lat, info.lon]).addTo(map)
+            .bindPopup(`Magnitude: ${info.mt}<br>Intensity: ${info.inT}`)
+            .openPopup();
+
+        // Clear the stored data
+        localStorage.removeItem('popupData');
+    }
+});
+</script>
 </body>
 </html>
