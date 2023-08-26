@@ -37,7 +37,7 @@ def fetch_and_send_data():
 
         return context
     else:
-        context = {'same' : 0}
+        context = {'same' : 1231314}
         return  context
         
 
@@ -47,7 +47,7 @@ def main_app(request):
 def schedule_fetch_and_send_data():
     while True:
         fetch_and_send_data()
-        time.sleep(3)  # 60초 = 1분
+        time.sleep(60)  # 60초 = 1분
 
 # 스레드 생성 및 시작
 schedule_thread = threading.Thread(target=schedule_fetch_and_send_data)

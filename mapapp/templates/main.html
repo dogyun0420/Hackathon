@@ -40,6 +40,7 @@ body {
         #map {
             width: 100%;
             height: 100%;
+            font-size: 20px;
         }
         #button-container {
         display: flex;
@@ -104,6 +105,10 @@ body {
             color: #666;
             opacity: 0.7;
         }
+        #text{
+            font-size: 10px;
+            background-color: white;
+        }
 </style>
 <title>Box 및 버튼 예제</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
@@ -114,7 +119,15 @@ body {
         <div id="inner_1">
             <p id="info"></p>
             <div id="info_box">
-                <div id="map"></div>
+                <div id="map">
+                    <p>평소에 이렇게 대비합니다.</p>
+                    <p>1. 집안의 안전을 확보합니다.</p>
+                    <p>2. 평소 비상용품을 잘 구비해 둡니다.</p>
+                    <p>3. 평소에 대피할 장소를 알아둡니다.</p>
+                    <p>4. 응급처치하는 방법을 훈련해 둡니다.</p>
+                    <p>5. 건물이나 담장은 주기적으로 점검하고 보수합니다.</p>
+
+                </div>
             </div>
             <div id="button-container">
                 <button type="button" onclick="location.href='/map_view';"> 주변 대피소 </button>
@@ -174,7 +187,7 @@ body {
                 <p>지진 규모 : ${info.mt}  지진 진도 : ${info.inT}</p>
             `;
             info_box.innerHTML = content;
-            
+            document.getElementById("map").textContent = "";
             
             // Show earthquake location on the map
             var map = new Tmapv2.Map("map", {
