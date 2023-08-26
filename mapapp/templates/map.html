@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,22 +14,45 @@
     }
 </style>
 <div id="map"></div>
+=======
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Nearest Shelters</title>
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+        
+    </head>
+    <body>
+    <div id="map" style="height: 1500px;"></div>
 
-<!-- 위치 정보 표시 -->
-<div id="location-info">
-    <p>Your Location: <span id="user-location"></span></p>
-    <p>Nearest Shelters:</p>
-    <ul id="shelters-list"></ul>
-</div>
+    <!-- 위치 정보 표시 -->
+    <!-- <div id="location-info">
+        <p style='font-size: 30px;'>Your Location: <span id="user-location"></span></p>
+        <p>Nearest Shelters:</p>
+        <ul id="shelters-list"></ul>
+    </div> -->
+>>>>>>> 20686d1d752dcfa4a3cb2d147bc3adf5d79eec26
 
+    <script>
+        document.cookie = 'my_cookie=cookie_value; samesite=lax';
+        var map = L.map('map').setView([0, 0], 25);
+
+<<<<<<< HEAD
 <script>
     document.cookie = 'my_cookie=cookie_value; samesite=lax';
     var map = L.map('map').setView([0, 0], 13);
+=======
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 25,
+        }).addTo(map);
+>>>>>>> 20686d1d752dcfa4a3cb2d147bc3adf5d79eec26
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-    }).addTo(map);
+        function showRouteWithEnd(userLatitude, userLongitude, endLatitude, endLongitude) {
+            window.location.href = `/tmap?user_lat=${userLatitude}&user_lng=${userLongitude}&end_lat=${endLatitude}&end_lng=${endLongitude}`;
+        }
 
+<<<<<<< HEAD
     function showRouteWithEnd(userLatitude, userLongitude, endLatitude, endLongitude) {
         window.location.href = `/tmap?user_lat=${userLatitude}&user_lng=${userLongitude}&end_lat=${endLatitude}&end_lng=${endLongitude}`;
     }
@@ -37,11 +61,26 @@
         navigator.geolocation.getCurrentPosition(function(position) {
             var userLatitude = position.coords.latitude;
             var userLongitude = position.coords.longitude;
+=======
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var userLatitude = position.coords.latitude;
+                var userLongitude = position.coords.longitude;
+>>>>>>> 20686d1d752dcfa4a3cb2d147bc3adf5d79eec26
 
-            map.setView([userLatitude, userLongitude], 13);
-            var userMarker = L.marker([userLatitude, userLongitude]).addTo(map);
-            userMarker.bindPopup("Your Location").openPopup();
+                map.setView([userLatitude, userLongitude], 15);
+                var userMarker = L.marker([userLatitude, userLongitude], {
+                    icon: L.icon({
+                        iconUrl: 'http://tmapapi.sktelecom.com/upload/tmap/marker/pin_r_m_s.png',
+                        iconSize: [72, 114],  // 마커 아이콘 크기
+                        iconAnchor: [40, 114], // 마커 아이콘의 앵커 위치 (마커 하단 중앙)
+                        popupAnchor: [0, -32] // 팝업이 마커 위에 표시되도록 위치 조정
+                    })  
+                }).addTo(map);
+                
+                userMarker.bindPopup("Your Location").openPopup();
 
+<<<<<<< HEAD
             document.getElementById('user-location').textContent = '(' + userLatitude + ', ' + userLongitude + ')';
             
             fetch('/map_view/?geolocation=1&latitude=' + userLatitude + '&longitude=' + userLongitude)
@@ -88,3 +127,149 @@
 </body>
 
 </html>
+=======
+                //document.getElementById('user-location').textContent = '(' + userLatitude + ', ' + userLongitude + ')';
+                
+                fetch('/map_view/?geolocation=1&latitude=' + userLatitude + '&longitude=' + userLongitude)
+                    .then(response => response.json())
+                    .then(data => {
+                        var sheltersList = document.getElementById('shelters-list');
+                        
+                        // Show nearest shelter
+                        var nearestShelter = data.nearest_shelters[0];
+                        var shelterMarker = L.marker([nearestShelter.ycord, nearestShelter.xcord], {
+                            icon: L.icon({
+                                iconUrl: 'http://tmapapi.sktelecom.com/upload/tmap/marker/pin_b_m_e.png',
+                                iconSize: [72, 114],  // 마커 아이콘 크기
+                                iconAnchor: [40, 114], // 마커 아이콘의 앵커 위치 (마커 하단 중앙)
+                                popupAnchor: [0, -114] // 팝업이 마커 위에 표시되도록 위치 조정
+                            })  
+                        }).addTo(map);
+                        shelterMarker.bindPopup("<div style='width: 300px; height: 100px;'><b style='font-size: 30px;'>" + nearestShelter.vt_acmdfclty_nm + "</b><br>" + nearestShelter.dtl_adres).openPopup();
+                        shelterMarker.on('click', function () {
+                            showRouteWithEnd(userLatitude, userLongitude, nearestShelter.ycord, nearestShelter.xcord);
+                        });
+
+                        // Show other shelters and add to shelters list
+                        data.nearest_shelters.slice(0).forEach(shelter => {
+                            var shelterMarker = L.marker([shelter.ycord, shelter.xcord], {
+                                icon: L.icon({
+                                    iconUrl: 'http://tmapapi.sktelecom.com/upload/tmap/marker/pin_b_m_e.png',
+                                    iconSize: [72, 114],  // 마커 아이콘 크기
+                                    iconAnchor: [40, 114], // 마커 아이콘의 앵커 위치 (마커 하단 중앙)
+                                    popupAnchor: [0, -114] // 팝업이 마커 위에 표시되도록 위치 조정
+                                })  
+                            }).addTo(map);;
+                            shelterMarker.bindPopup("<b>" + shelter.vt_acmdfclty_nm + "</b><br>" + shelter.dtl_adres);
+                            shelterMarker.on('click', function () {
+                                showRouteWithEnd(userLatitude, userLongitude, shelter.ycord, shelter.xcord);
+                            });
+                            
+                            var shelterItem = document.createElement('li');
+                            //shelterItem.textContent = shelter.vt_acmdfclty_nm + ': (' + shelter.ycord + ', ' + shelter.xcord + ')';
+                            //sheltersList.appendChild(shelterItem);
+                        });
+                    });
+            });
+        }
+        
+        function showRoute() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var userLatitude = position.coords.latitude;
+                    var userLongitude = position.coords.longitude;
+
+                    window.location.href = `/tmap?user_lat=${userLatitude}&user_lng=${userLongitude}`;
+                });
+            }
+        }
+    </script>
+
+    </body>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+    
+        #result {
+            border: 1px solid #000;
+            padding: 10px;
+            width: 900px; /* 원하는 너비로 조정하세요 */
+            height: 50px; /* 원하는 높이로 조정하세요 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 28px;
+        }
+    
+    
+    
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between; /* 아래 여백 추가 */
+            border: 1px solid #ccc;
+            padding: 20px;
+            background-color: #f5f5f5;
+            min-height: 10vh; /* 뷰포트 높이만큼 최소 높이 설정 */
+        }
+        #out {
+            
+            padding: 10px;
+            width: 350px; /* 원하는 너비로 조정하세요 */
+            height: 35px; /* 원하는 높이로 조정하세요 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            background-color:rgba(30, 144, 255, 0.2); 
+            border-radius: 15px;
+            font-size: 28px
+        }
+        #infoBox {
+            max-height: calc(100vh - 70px); /* 뷰포트 높이에서 상단 요소 높이를 빼서 최대 높이 설정 */
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            width: 80%;
+            background-color: white;
+            text-align: center;
+            border-radius: 15px;
+            margin-top: -10px; /* 음수 값으로 설정하여 겹치도록 만듦 */
+            overflow-y: auto; /* 내용이 넘칠 때 스크롤 표시 */
+        }
+        #infoBox p1 {
+            font-weight: bold; /* 해당 <p> 요소에 스타일 추가 */
+        }
+        #infoBox img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+   
+    <form>
+            <p id="result">지도상의 대피소가 멀다면 낙하물이 없는 넓은 공간으로 이동합니다.</p>
+            <p id="out">흔들림이 멈춘 후 행동 요령</p>
+            <div id="infoBox">
+                <p1>가스와 전깃불을 차단하고 문을 열어 출구를 확보합니다.</p1>
+                <p>･ 흔들림이 멈춘 후 당황하지 말고 화재에 대비하여 가스와 전깃불을 끕니다.</p>
+                <p>･ 문이나 창문을 열어 언제든 대피할 수 있도록 출구를 확보합니다.</p>
+                <p>･ 흔들림이 멈추면, 출구를 통해 밖으로 나갑니다.</p>
+                <img src="https://dbscthumb-phinf.pstatic.net/3065_000_1/20170223112620245_B94I4CCIL.png/nema_0012_i4.png?type=w530_fst&wm=N">
+                <p1>집에서 나갈 때는 신발은 꼭 신고 이동합니다.</p1>
+                <p>･ 지진이 발생하면 유리 조각이나 떨어져 있는 물체 때문에 발을 다칠 수 있으니, 발을 보호할 수 있는 신발을 신고 이동합니다.</p>
+                <p1>계단을 이용하여 밖으로 대피합니다.</p1>
+                <p>. 지진이 나면 엘리베이터가 멈출 수 있으므로 타지 말고, 계단을 이용하여 건물 밖으로 대피합니다.</p>
+                <p>.밖으로 나갈 때에는 떨어지는 유리, 간판, 기와 등에 주의하며, 소지품으로 몸을 보호하면서 침착하게 대피합니다.</p>
+                <img src="https://dbscthumb-phinf.pstatic.net/3065_000_1/20170223112620266_41JE7F4J1.png/nema_0012_i5.png?type=w530_fst&wm=N">
+            </div>
+    </form>
+    </html>
+>>>>>>> 20686d1d752dcfa4a3cb2d147bc3adf5d79eec26

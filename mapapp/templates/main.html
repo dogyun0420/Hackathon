@@ -20,7 +20,11 @@ body {
             height: 100%;
         }
         #inner_1 {
+<<<<<<< HEAD
             width: 390px; /* Adjust width */
+=======
+            width: 350px; /* Adjust width */
+>>>>>>> 20686d1d752dcfa4a3cb2d147bc3adf5d79eec26
             height: 844px; /* Adjust height */
             background-color: #435334;
             position: absolute;
@@ -32,7 +36,11 @@ body {
         }
         #info_box {
             width: 100%;
+<<<<<<< HEAD
             height: calc(100% - 100px); /* Adjust height to leave space for buttons and info */
+=======
+            height: calc(60% - 100px); /* Adjust height to leave space for buttons and info */
+>>>>>>> 20686d1d752dcfa4a3cb2d147bc3adf5d79eec26
             background-color: white;
             margin-top: 10px;
             margin-bottom: 20px;
@@ -40,6 +48,10 @@ body {
         #map {
             width: 100%;
             height: 100%;
+<<<<<<< HEAD
+=======
+            font-size: 20px;
+>>>>>>> 20686d1d752dcfa4a3cb2d147bc3adf5d79eec26
         }
         #button-container {
         display: flex;
@@ -104,6 +116,13 @@ body {
             color: #666;
             opacity: 0.7;
         }
+<<<<<<< HEAD
+=======
+        #text{
+            font-size: 10px;
+            background-color: white;
+        }
+>>>>>>> 20686d1d752dcfa4a3cb2d147bc3adf5d79eec26
 </style>
 <title>Box 및 버튼 예제</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
@@ -114,7 +133,19 @@ body {
         <div id="inner_1">
             <p id="info"></p>
             <div id="info_box">
+<<<<<<< HEAD
                 <div id="map"></div>
+=======
+                <div id="map">
+                    <p>평소에 이렇게 대비합니다.</p>
+                    <p>1. 집안의 안전을 확보합니다.</p>
+                    <p>2. 평소 비상용품을 잘 구비해 둡니다.</p>
+                    <p>3. 평소에 대피할 장소를 알아둡니다.</p>
+                    <p>4. 응급처치하는 방법을 훈련해 둡니다.</p>
+                    <p>5. 건물이나 담장은 주기적으로 점검하고 보수합니다.</p>
+
+                </div>
+>>>>>>> 20686d1d752dcfa4a3cb2d147bc3adf5d79eec26
             </div>
             <div id="button-container">
                 <button type="button" onclick="location.href='/map_view';"> 주변 대피소 </button>
@@ -174,7 +205,7 @@ body {
                 <p>지진 규모 : ${info.mt}  지진 진도 : ${info.inT}</p>
             `;
             info_box.innerHTML = content;
-            
+            document.getElementById("map").textContent = "";
             
             // Show earthquake location on the map
             var map = new Tmapv2.Map("map", {
