@@ -4,8 +4,9 @@ import schedule
 import time
 from django.shortcuts import render
 from django.http import JsonResponse
+import threading
 
-def fetch_and_save_data():
+def fetch_and_send_data():
     api_key = "-mPst9VqQ9Kj7LfVaoPS6Q"
     base_url = "https://apihub.kma.go.kr/api/typ02/openApi/EqkInfoService/getEqkMsg?pageNo=1&numOfRows=1&dataType=JSON&fromTmFc=20171101&toTmFc=20230825&authKey=-mPst9VqQ9Kj7LfVaoPS6Q"
 
@@ -25,19 +26,30 @@ def fetch_and_save_data():
     now_tmSeq = data.get('response').get('header').get('tmSeq') #발표일련번호
     past_tmSeq = now_tmSeq
 
-    print(f"일련번호: {now_tmSeq}")
-    print(f"일련번호: {past_tmSeq}")
-#    if past_tmSeq != now_tmSeq:
-        #지진 발생
-#    else:
-        #괜춘
-    
+    if past_tmSeq != now_tmSeq:
+        tmEqk = data.get('response').get('header').get('tmEqk')
+        lat= data.get('response').get('header').get('lat')
+        lon= data.get('response').get('header').get('lon')
+        mt= data.get('response').get('header').get('mt')
+        inT= data.get('response').get('header').get('inT')
+
+        context = {'tmSeq' : now_tmSeq, 'tmEqk' : tmEqk, 'lat' : lat, 'lon': lon, 'mt' : mt, 'inT' : inT}
+
+        return context
+    else:
+        context = {'same' : 0}
+        return  context
+        
 
 def main_app(request):
-    # 1분마다 fetch_and_save_data 함수를 실행
-    # schedule.every(60).seconds.do(fetch_and_save_data)
+    return render(request, 'main.html', fetch_and_send_data())
 
-    # while True:
-    #     schedule.run_pending()
-    #     time.sleep(1)
-    return render(request,"main.html")
+def schedule_fetch_and_send_data():
+    while True:
+        fetch_and_send_data()
+        time.sleep(3)  # 60초 = 1분
+
+# 스레드 생성 및 시작
+schedule_thread = threading.Thread(target=schedule_fetch_and_send_data)
+schedule_thread.daemon = True
+schedule_thread.start()

@@ -5,115 +5,219 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 {% load static %}
-<style>
+<style>    
 body {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.container {
-    width: 100%;
-    height: 100%;
-}
-#inner_1 {
-    width: 50%;
-    height: 100%;
-    background-color: burlywood;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-#info_box {
-    width: 500px;
-    height: 400px;
-    background-color: white;
-    margin-bottom: 20px;
-    margin-top: 80px; /* 내리려는 만큼의 여백 추가 */
-}
-#button-container {
-    display: flex;
-    justify-content: center;
-}
-#button-container button {
-    margin: 50px 100px; /* 버튼 사이의 가로 간격을 늘림 */
-    padding: 20px 40px;
-    border-radius: 15px; /* 버튼 몸체를 둥글게 만듦 */
-    background-color: brown;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-}
-#backgrond{
-    background-color: brown;
-}
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0; /* Adding a background color for visualization */
+        }
+        .container {
+            width: 100%;
+            height: 100%;
+        }
+        #inner_1 {
+            width: 350px; /* Adjust width */
+            height: 844px; /* Adjust height */
+            background-color: #435334;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #info_box {
+            width: 100%;
+            height: calc(60% - 100px); /* Adjust height to leave space for buttons and info */
+            background-color: white;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+        #button-container {
+        display: flex;
+        flex-direction: column; /* Change to column layout */
+        align-items: center; /* Align buttons horizontally in the center */
+        }
 
-#map {
-    width: 500px; /* 지도 너비 조절 */
-    height: 400px; /* 지도 높이 조절 */
-    margin-top: 20px;
-}
+        #button-container button {
+            margin: 10px 0; /* Adjust margin between buttons */
+            padding: 20px 30px;
+            border-radius: 15px;
+            font-weight: bold;
+            background-color: #CEDEBD;
+            color: #000000;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        #button-container button:hover {
+        background-color: #9EB384; /* Change background color on hover */
+        color: white; /* Change text color on hover */
+        }    
+        #info {
+            font-size: 20px; /* Adjust font size */
+            width: 100%;
+            font-weight: bold;
+            background-color: #FAF1E4;
+            background-clip: border-box;
+            text-align: center;
+        }
+        #infoBox {
+            display: none;
+            border: 1px solid #ccc;
+            padding: 10px;
+            width: 300px;
+            height: 500px;
+            position: absolute;
+            overflow-y: auto;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: white;
+        }
+        #infoBox p1 {
+            font-weight: bold; /* 해당 <p> 요소에 스타일 추가 */
+        }
+        #infoBox img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+            display: block;
+            margin: 0 auto;
+        }
+        #closeButton {
+            position: fixed;
+            top: 1px;
+            right: 1px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 2px;
+            color: #666;
+            opacity: 0.7;
+        }
 </style>
 <title>Box 및 버튼 예제</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 </head>
 <body>
-    <div id='container'>
-        <div id='inner_1'>
+    <div id="container">
+        <div id="inner_1">
+            <p id="info"></p>
             <div id="info_box">
-                <p>여기에 글이 들어갈 박스입니다.</p>
+                <div id="map"></div>
             </div>
-            <div id ='button-container'>
-                <button type="'button" onclick="location.href='/map_view';"> 대피소 </button>
-                <button type="'button"> 지진대피요령 </button>
+            <div id="button-container">
+                <button type="button" onclick="location.href='/map_view';"> 주변 대피소 </button>
+                <button id="infoButton" type="button">지진 대피 요령</button>
+                    <div id="infoBox">
+                        <button id="closeButton" onclick="closeInfoBox()">X</button>
+                        <p1>1. 튼튼한 탁자 아래에 들어가 몸을 보호합니다.</p1>
+                        <p>･ 지진으로 크게 흔들리는 시간은 길어야 1~2분 정도입니다.</p>
+                        <p>･ 튼튼한 탁자의 아래로 들어가 탁자 다리를 꼭 잡고 몸을 보호합니다.</p>
+                        <p>･ 탁자 아래와 같이 피할 곳이 없을 때에는 방석 등으로 머리를 보호합니다.</p>
+                        <img src="https://dbscthumb-phinf.pstatic.net/3065_000_1/20170223112620256_JYW434YUZ.png/nema_0012_i3.png?type=w530_fst&wm=N">
+                        <p1>2. 가스와 전깃불을 차단하고 문을 열어 출구를 확보합니다.</p1>
+                        <p>･ 흔들림이 멈춘 후 당황하지 말고 화재에 대비하여 가스와 전깃불을 끕니다.</p>
+                        <p>･ 문이나 창문을 열어 언제든 대피할 수 있도록 출구를 확보합니다.</p>
+                        <p>･ 흔들림이 멈추면, 출구를 통해 밖으로 나갑니다.</p>
+                        <img src="https://dbscthumb-phinf.pstatic.net/3065_000_1/20170223112620245_B94I4CCIL.png/nema_0012_i4.png?type=w530_fst&wm=N">
+                        <p1>3. 집에서 나갈 때는 신발은 꼭 신고 이동합니다.</p1>
+                        <p>･ 지진이 발생하면 유리 조각이나 떨어져 있는 물체 때문에 발을 다칠 수 있으니, 발을 보호할 수 있는 신발을 신고 이동합니다.</p>
+                        <p1>4. 계단을 이용하여 밖으로 대피합니다.</p1>
+                        <p>･ 지진이 나면 엘리베이터가 멈출 수 있으므로 타지 말고, 계단을 이용하여 건물 밖으로 대피합니다.</p>
+                        <p>･ 밖으로 나갈 때에는 떨어지는 유리, 간판, 기와 등에 주의하며, 소지품으로 몸을 보호하면서 침착하게 대피합니다.</p>
+                        <img src="https://dbscthumb-phinf.pstatic.net/3065_000_1/20170223112620266_41JE7F4J1.png/nema_0012_i5.png?type=w530_fst&wm=N">
+                    </div>
             </div>
-            <hr>
-            <p id="'backgrond">스타필드 한글화 왜 안해주냐고.</p>
         </div>
     </div>
-
-<div id="map" style="width: 100%; height: 100%;"></div>
-
     
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var storedData = localStorage.getItem('popupData');
-    if (storedData) {
-        var info = JSON.parse(storedData);
-        var info_box = document.getElementById('info_box');
-        
-        var content = `
-            <p>Latitude: ${info.lat}</p>
-            <p>Longitude: ${info.lon}</p>
-            <p>Magnitude: ${info.mt}</p>
-            <p>Intensity: ${info.inT}</p>
-        `;
-        
-        info_box.innerHTML = content;
-        
-        // Create and display the map
-        var map = L.map('map').setView([info.lat, info.lon], 13);
 
-        // Add a tile layer (OpenStreetMap)
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-        }).addTo(map);
+    <script>
+        const infoButton = document.getElementById("infoButton");
+        const infoBox = document.getElementById("infoBox");
+        function closeInfoBox() {
+            var infoBox = document.getElementById("infoBox");
+            infoBox.style.display = "none";
+        }
+        infoButton.addEventListener("click", () => {
+            if (infoBox.style.display === "none") {
+                infoBox.style.display = "block";
+            } else {
+                infoBox.style.display = "none";
+            }
+        });
+    </script>
+    
+    
+    <script	src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=2dGQfai3cs3zCZ4EdAkbX62hAsNrCO8N50yYPfWL"></script>
+	<script type="text/javascript">    
+    document.addEventListener('DOMContentLoaded', function() {
+        var storedData = localStorage.getItem('popupData');
+        if (storedData) {
+            var info = JSON.parse(storedData);
+            
+            // Show earthquake info text
+            var info_box = document.getElementById('info');
+            var content = `
+                <p>지진 규모 : ${info.mt}  지진 진도 : ${info.inT}</p>
+            `;
+            info_box.innerHTML = content;
+            
+            
+            // Show earthquake location on the map
+            var map = new Tmapv2.Map("map", {
+            center: new Tmapv2.LatLng(info.lat, info.lon), // info.lat과 info.lon은 해당 좌표값으로 변경
+            width: "100%",
+            height: "100%",
+            zoom: 10
+        });
 
-        // Add a marker at the earthquake location
-        L.marker([info.lat, info.lon]).addTo(map)
-            .bindPopup(`Magnitude: ${info.mt}<br>Intensity: ${info.inT}`)
-            .openPopup();
+        var radius = 1000;
+        var circle = new Tmapv2.Circle({
+            center: new Tmapv2.LatLng(info.lat, info.lon), // info.lat과 info.lon은 해당 좌표값으로 변경
+            radius: radius, // 초기 반지름 설정 (미터 단위)
+            strokeColor: "#FF0000", // 테두리 색상
+            strokeWeight: 2, // 테두리 두께
+            strokeOpacity: 0.8, // 테두리 투명도
+            fillColor: "#FF0000", // 채우기 색상
+            fillOpacity: 0.35, // 채우기 투명도
+            label: "지진 발생지",
+            map: map,
+        });
 
-        // Clear the stored data
-        localStorage.removeItem('popupData');
-    }
-});
-</script>
+        // 원의 크기 조절 애니메이션
+        var animationInterval = setInterval(function() {
+            radius += 1; // 반지름을 10씩 증가
+            circle.setRadius(radius);
+        }, 100); // 1초마다 반지름 조정
+
+        // 원의 크기 조절 애니메이션
+        function animateCircle() {
+            setInterval(function() {
+                radius += 100; // 반지름을 10씩 증가
+                if (radius > 20000) {
+                    radius = 1; // 원의 크기가 일정 크기 이상이면 초기 크기로 되돌림
+                }
+                circle.setRadius(radius);
+            }, 1); // 1초마다 반지름 조정
+        }
+        animateCircle();
+            // Clear the stored data
+            localStorage.removeItem('popupData');
+        }
+    });
+    </script>
 </body>
 </html>
